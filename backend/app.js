@@ -39,6 +39,54 @@ app.get('/api/health', (req, res) => {
   res.json({ message: 'Servidor do Sistema de Controle de Estoque funcionando!' });
 });
 
+// Novo Endpoint 1: Relatorio de Estoque Baixo
+app.get('/api/relatorios/estoque-baixo', (req, res) => {
+  const parsed = parseInt(req.query.limite);
+  const limite = isNaN(parsed) ? 10 : parsed;
+  const produtosBaixoEstoque = db.produtos
+    .filter(p => p.quantidade_estoque <= limite)
+    .map(p => ({
+      id: p.id,
+      nome: p.nome,
+      categoria: p.categoria,
+      quantidade_estoque: p.quantidade_estoque,
+      preco: p.preco,
+      status: p.quantidade_estoque === 0 ? 'CRITICO' : 'BAIXO',
+    }))
+    .sort((a, b) => a.quantidade_estoque - b.quantidade_estoque);
+  res.json({
+    limite_utilizado: limite,
+    total_produtos_baixo_estoque: produtosBaixoEstoque.length,
+    produtos: produtosBaixoEstoque,
+  });
+});
+
+// Novo Endpoint 2: Estatisticas Gerais
+app.get('/api/estatisticas', (req, res) => {
+  const totalProdutos = db.produtos.length;
+  const totalFornecedores = db.fornecedores.length;
+  const totalAssociacoes = db.associacoes.length;
+  const valorTotalEstoque = db.produtos.reduce((sum, p) => sum + (p.preco || 0) * p.quantidade_estoque, 0);
+  const totalItensEstoque = db.produtos.reduce((sum, p) => sum + p.quantidade_estoque, 0);
+  const categorias = {};
+  db.produtos.forEach(p => {
+    categorias[p.categoria] = (categorias[p.categoria] || 0) + 1;
+  });
+  const produtosComAssoc = new Set(db.associacoes.map(a => a.produto_id));
+  const produtosSemFornecedor = db.produtos
+    .filter(p => !produtosComAssoc.has(p.id))
+    .map(p => ({ id: p.id, nome: p.nome }));
+  res.json({
+    total_produtos: totalProdutos,
+    total_fornecedores: totalFornecedores,
+    total_associacoes: totalAssociacoes,
+    valor_total_estoque: Math.round(valorTotalEstoque * 100) / 100,
+    total_itens_estoque: totalItensEstoque,
+    produtos_por_categoria: categorias,
+    produtos_sem_fornecedor: produtosSemFornecedor,
+  });
+});
+
 // Fallback to frontend for SPA routing
 app.get('*', (req, res) => {
   const indexPath = path.join(frontendPath, 'index.html');
