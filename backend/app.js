@@ -41,7 +41,8 @@ app.get('/api/health', (req, res) => {
 
 // Novo Endpoint 1: Relatorio de Estoque Baixo
 app.get('/api/relatorios/estoque-baixo', (req, res) => {
-  const limite = parseInt(req.query.limite) || 10;
+  const parsed = parseInt(req.query.limite);
+  const limite = isNaN(parsed) ? 10 : parsed;
   const produtosBaixoEstoque = db.produtos
     .filter(p => p.quantidade_estoque <= limite)
     .map(p => ({
