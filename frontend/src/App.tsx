@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Produtos from './pages/Produtos';
 import Fornecedores from './pages/Fornecedores';
 import Associacoes from './pages/Associacoes';
+import Convite from './pages/Convite';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/produtos" element={<Produtos />} />
           <Route path="/fornecedores" element={<Fornecedores />} />
           <Route path="/associacoes" element={<Associacoes />} />
+          <Route path="/convite" element={<Convite />} />
         </Routes>
       </Layout>
     </Router>
