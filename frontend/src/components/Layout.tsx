@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Package, Truck, LinkIcon } from 'lucide-react';
+import { Package, Truck, LinkIcon, PartyPopper } from 'lucide-react';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -8,6 +8,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { path: '/produtos', label: 'Produtos', icon: Package },
     { path: '/fornecedores', label: 'Fornecedores', icon: Truck },
     { path: '/associacoes', label: 'Associacoes', icon: LinkIcon },
+    { path: '/convite', label: 'Convite', icon: PartyPopper },
   ];
 
   return (
